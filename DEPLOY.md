@@ -4,6 +4,8 @@ This guide gets the **AgroFlourish** app (frontend + API + database) running on 
 
 **Strategy:** One combined app (API serves the React frontend + `/api`). Free PostgreSQL (Neon). Free hosting (Render).
 
+For local install and run, see the [README](./README.md).
+
 ---
 
 ## What you’ll use (all free)
@@ -64,16 +66,17 @@ This guide gets the **AgroFlourish** app (frontend + API + database) running on 
 3. **Configure the service**
    - **Name:** e.g. `agroflourish`.
    - **Region:** pick one close to you.
-   - **Root directory (important):** set to `AgroFlourish` (the monorepo folder with `package.json`, `pnpm-workspace.yaml`, `artifacts/`, `lib/`).  
-     If your repo root *is* the monorepo, leave this blank.
+  - **Root directory (important):**  
+    - If you pushed the **whole repo** (so the repo has an `AgroFlourish` folder inside it), set to `AgroFlourish`.  
+    - If you pushed **only the app** (so `package.json` is at the repo root), **leave this blank**.
    - **Runtime:** Node.
    - **Build command:**
      ```bash
-     corepack enable && corepack prepare pnpm@latest --activate && pnpm install && PORT=5173 BASE_PATH=/ pnpm run build
+     corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run build:deploy
      ```
    - **Start command:**
      ```bash
-     node artifacts/api-server/dist/index.cjs
+     pnpm run start
      ```
 
 4. **Environment variables** (in Render: Environment tab)
@@ -94,15 +97,15 @@ This guide gets the **AgroFlourish** app (frontend + API + database) running on 
    - Render will install deps, run the build, then start the server. First deploy can take a few minutes.
 
 6. **Apply database schema (first time only)**
-   - After the first successful deploy, run the Drizzle push from your **local** machine (with the same `DATABASE_URL`), or use Render’s **Shell**:
+   - After the first successful deploy, run the schema push from your **local** machine (with the same `DATABASE_URL`), or use Render’s **Shell**:
      - Open your service → **Shell** tab.
-     - In the shell (which is in the repo root, e.g. `AgroFlourish/`):
+     - In the shell (which is in the app root, e.g. `AgroFlourish/`):
        ```bash
-       pnpm --filter @workspace/db run push
+       pnpm run db:push
        ```
-   - If you prefer local: in `AgroFlourish/` create a `.env` with `DATABASE_URL=...` (same as Render), then run:
+   - If you prefer local: in `AgroFlourish/` copy `.env.example` to `.env`, set `DATABASE_URL` (same as Render), then run:
      ```bash
-     pnpm --filter @workspace/db run push
+     pnpm run db:push
      ```
 
 7. **Open the app**
@@ -125,54 +128,41 @@ This guide gets the **AgroFlourish** app (frontend + API + database) running on 
 
 ## Optional: Run the same stack locally
 
+From the [README](./README.md): use the app’s scripts so you don’t have to remember paths:
+
 1. **Node & pnpm**
-   - Node 24 (e.g. `nvm install 24 && nvm use 24`).
+   - Node 20+ or 24 (e.g. `nvm install 24 && nvm use 24`).
    - `corepack enable && corepack prepare pnpm@latest --activate`.
 
 2. **Env**
-   - In `AgroFlourish/` create `.env`:
-     ```bash
-     DATABASE_URL=postgresql://...   # same Neon URL
-     PORT=3000
-     PUBLIC_DIR=artifacts/agroflourish/dist/public
-     ```
+   - In `AgroFlourish/` copy `.env.example` to `.env` and set `DATABASE_URL` (and optionally `PORT`, `PUBLIC_DIR`, `NODE_ENV`).
 
-3. **DB schema**
+3. **Install, schema, build, run**
    ```bash
    cd AgroFlourish
    pnpm install
-   pnpm --filter @workspace/db run push
+   pnpm run db:push
+   pnpm run build:deploy
+   pnpm run start
    ```
-
-4. **Build frontend**
-   ```bash
-   PORT=5173 BASE_PATH=/ pnpm --filter @workspace/agroflourish run build
-   ```
-
-5. **Build API**
-   ```bash
-   pnpm --filter @workspace/api-server run build
-   ```
-
-6. **Run server**
-   ```bash
-   node artifacts/api-server/dist/index.cjs
-   ```
-   Open [http://localhost:3000](http://localhost:3000).
+   Open [http://localhost:3000](http://localhost:3000) (or your `PORT`).
 
 ---
 
 ## Troubleshooting
 
+- **`ERR_PNPM_NO_PKG_MANIFEST` / No package.json found in .../AgroFlourish**  
+  Your repo root is already the monorepo (package.json at root). In Render → Service → Settings → **Root directory**, clear the value and leave it **blank**, then redeploy.
+
 - **Build fails on “Use pnpm instead”**  
   Build command must use `pnpm` (see above). Ensure `corepack enable` and `pnpm` install/run are in the same build command.
 
 - **Build fails: PORT or BASE_PATH**  
-  The frontend build needs env: `PORT=5173 BASE_PATH=/` in the Render build step (as in the build command above).
+  The `build:deploy` script sets these for the frontend build. If you run the frontend build manually, use `PORT=5173 BASE_PATH=/`.
 
 - **Blank page or 404**
   - Check that `PUBLIC_DIR=artifacts/agroflourish/dist/public` is set in Render.
-  - Ensure start command is `node artifacts/api-server/dist/index.cjs` and root directory is `AgroFlourish` (or your monorepo root).
+  - Ensure start command is `pnpm run start` and root directory is `AgroFlourish` (or your app root).
 
 - **Database connection errors**
   - In Neon, ensure “Pooled” or the correct connection string is used and `?sslmode=require` is present.
@@ -187,8 +177,10 @@ This guide gets the **AgroFlourish** app (frontend + API + database) running on 
 
 To deploy **Tenant-Nexus** the same way:
 
-- Use **Root directory** `Tenant-Nexus` in Render.
-- Use the same **build** and **start** pattern, but with paths under `Tenant-Nexus/` (e.g. `artifacts/api-server/dist/index.cjs`, `PUBLIC_DIR=artifacts/mockup-sandbox/dist/public` or whatever your frontend artifact is).
-- Create a separate Neon project (or database) and set `DATABASE_URL` for Tenant-Nexus to that.
+- **Root directory:** `Tenant-Nexus`.
+- **Build command:** `corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run build:deploy`
+- **Start command:** `pnpm run start`
+- **Environment:** Same as above; set `PUBLIC_DIR=artifacts/mockup-sandbox/dist` (Tenant-Nexus frontend outputs to `dist`, not `dist/public`).
+- Use a separate Neon project (or database) and set `DATABASE_URL` for Tenant-Nexus to that.
 
-You can repeat the same steps in this guide with the Tenant-Nexus folder and its frontend artifact path.
+Otherwise repeat the same steps in this guide for the Tenant-Nexus app.
