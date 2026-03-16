@@ -68,6 +68,7 @@ export function useContent() {
       email: siteContent.contact.email,
       address: siteContent.contact.address,
       mapsUrl: siteContent.contact.mapsUrl,
+      socials: siteContent.contact.socials,
     },
     global: {
       ...t.global,

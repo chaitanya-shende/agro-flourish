@@ -1,6 +1,6 @@
 "use client";
 
-import { Sprout, Mail, Phone, MapPin } from "lucide-react";
+import { Sprout, Mail, Phone, MapPin, Facebook, Instagram, Youtube } from "lucide-react";
 import { useContent } from "@/contexts/LanguageContext";
 
 const footerLinkHrefs = ["#about", "#how-it-works", "#products", "#contact"];
@@ -26,6 +26,17 @@ export function Footer() {
               <span className="font-display font-bold text-2xl tracking-tight text-white">{c.global.businessName}</span>
             </div>
             <p className="text-primary-foreground/80 max-w-xs leading-relaxed">{c.global.shortDescription}</p>
+            <div className="flex items-center gap-3 pt-2">
+              <a href={c.contact.socials.facebook} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 hover:text-accent transition-colors" aria-label="Facebook">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href={c.contact.socials.instagram} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 hover:text-accent transition-colors" aria-label="Instagram">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href={c.contact.socials.youtube} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 hover:text-accent transition-colors" aria-label="YouTube">
+                <Youtube className="h-5 w-5" />
+              </a>
+            </div>
           </div>
           <div>
             <h3 className="font-display font-bold text-lg mb-4 text-white">{c.footer.quickLinks}</h3>
