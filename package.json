@@ -2,8 +2,11 @@
   "name": "agroflourish-repo",
   "version": "0.0.0",
   "private": true,
-  "description": "AgroFlourish monorepo – install and run from app directories (AgroFlourish or Tenant-Nexus)",
+  "description": "AgroFlourish – Next.js website (agroflourish-next)",
   "scripts": {
-    "install:all": "cd AgroFlourish && pnpm install && cd ../Tenant-Nexus && pnpm install"
+    "dev": "cd agroflourish-next && npm run dev",
+    "build": "cd agroflourish-next && npm run build",
+    "lint": "cd agroflourish-next && npm run lint",
+    "typecheck": "cd agroflourish-next && npm run typecheck"
   }
 }

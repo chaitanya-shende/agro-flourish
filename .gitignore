@@ -1,0 +1,5 @@
+# OS
+.DS_Store
+
+# Dependencies (agroflourish-next uses its own node_modules)
+node_modules/
