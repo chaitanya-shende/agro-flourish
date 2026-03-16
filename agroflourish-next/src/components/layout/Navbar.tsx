@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Sprout } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -46,8 +47,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <a href="#home" onClick={(e) => handleScrollTo(e, "#home")} className="flex items-center gap-2 group">
-            <div className="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-colors">
-              <Sprout className="h-6 w-6 text-primary" />
+            <div className="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-colors flex items-center justify-center">
+              <Image src="/agroflourish.svg" alt="AgroFlourish" width={28} height={28} className="h-7 w-7" />
             </div>
             <span className={cn("font-display font-bold text-2xl tracking-tight transition-colors", isScrolled ? "text-primary" : "text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]")}>AgroFlourish</span>
           </a>

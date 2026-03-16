@@ -12,6 +12,9 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 export const metadata: Metadata = {
   title: "AgroFlourish – Fresh, Pesticide-Free Hydroponic Vegetables",
   description: "We grow plants smartly without soil, using nutrient-rich water and coco peat for a sustainable future. Grown locally in Nagpur, Maharashtra.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     title: "AgroFlourish – Fresh, Pesticide-Free Hydroponic Vegetables",
     description: "We grow plants smartly without soil, using nutrient-rich water and coco peat for a sustainable future.",

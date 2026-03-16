@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useContent } from "@/contexts/LanguageContext";
 
@@ -10,8 +11,18 @@ export function WhyHydroponics() {
   const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
   return (
-    <section className="py-24 bg-secondary/50 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/texture-leaf.png"
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-background/20" aria-hidden />
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-3">{c.whyHydroponics.sectionLabel}</h2>
           <h3 className="font-display text-4xl md:text-5xl font-bold text-foreground">{c.whyHydroponics.title}</h3>
@@ -20,7 +31,7 @@ export function WhyHydroponics() {
           {c.whyHydroponics.items.map((benefit, idx) => {
             const Icon = benefit.icon;
             return (
-              <motion.div key={idx} variants={item} className="bg-card p-8 rounded-3xl shadow-lg shadow-black/5 border border-border/50 hover:shadow-xl hover:border-primary/20 transition-all duration-300 hover:-translate-y-1 group">
+              <motion.div key={idx} variants={item} className="bg-card/95 backdrop-blur-xs p-8 rounded-3xl shadow-xl shadow-black/10 border border-border/60 hover:shadow-2xl hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 group">
                 <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary transition-all duration-300">
                   <Icon className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
                 </div>

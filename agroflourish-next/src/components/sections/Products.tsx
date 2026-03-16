@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useContent } from "@/contexts/LanguageContext";
 
@@ -7,8 +8,18 @@ export function Products() {
   const c = useContent();
 
   return (
-    <section id="products" className="py-24 bg-background relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="products" className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/fresh-harvest.png"
+          alt="Fresh harvest of vegetables"
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-background/85" aria-hidden />
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div className="max-w-2xl">
             <h2 className="text-primary font-bold tracking-wider uppercase text-sm mb-3 flex items-center gap-2">

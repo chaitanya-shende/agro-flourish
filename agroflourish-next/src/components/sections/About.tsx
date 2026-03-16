@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Leaf } from "lucide-react";
 import { useContent } from "@/contexts/LanguageContext";
@@ -12,7 +13,14 @@ export function About() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] group bg-secondary/30 transition-transform duration-700 group-hover:scale-105">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] group bg-secondary/30">
+              <Image
+                src="/images/about-farm.png"
+                alt="Indoor hydroponic farm with leafy greens"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
               <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-3xl pointer-events-none" />
             </div>
             <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-accent/20 rounded-full blur-3xl -z-10" />
