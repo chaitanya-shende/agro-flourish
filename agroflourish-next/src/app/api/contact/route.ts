@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   const resend = new Resend(apiKey);
 
-  let body: { name?: string; email?: string; message?: string };
+  let body: { name?: string; email?: string; phone?: string; message?: string };
   try {
     body = await request.json();
   } catch {
@@ -23,6 +23,8 @@ export async function POST(request: Request) {
 
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim() : "";
+  const phoneRaw = typeof body.phone === "string" ? body.phone.trim() : "";
+  const phoneDigits = phoneRaw.replace(/\D/g, "");
   const message = typeof body.message === "string" ? body.message.trim() : "";
 
   if (!name || name.length < 2) {
@@ -30,6 +32,9 @@ export async function POST(request: Request) {
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Valid email is required." }, { status: 400 });
+  }
+  if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+    return NextResponse.json({ error: "Valid phone number is required (8–15 digits)." }, { status: 400 });
   }
   if (!message || message.length < 10) {
     return NextResponse.json({ error: "Message must be at least 10 characters." }, { status: 400 });
@@ -43,6 +48,7 @@ export async function POST(request: Request) {
       subject: `Contact form: ${name}`,
       html: `
         <p><strong>From:</strong> ${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;</p>
+        <p><strong>Phone / WhatsApp:</strong> ${escapeHtml(phoneRaw || phoneDigits)}</p>
         <p><strong>Message:</strong></p>
         <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
       `,

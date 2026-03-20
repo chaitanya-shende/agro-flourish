@@ -3,31 +3,69 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Send, CheckCircle2, ExternalLink } from "lucide-react";
+import { Phone, Mail, MapPin, Send, CheckCircle2, ExternalLink, Copy, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContent } from "@/contexts/LanguageContext";
 
-type ContactFormValues = { name: string; email: string; message: string };
+type ContactFormValues = { name: string; email: string; phone: string; message: string };
+
+function phoneDigits(value: string): string {
+  return value.replace(/\D/g, "");
+}
 
 export function Contact() {
   const c = useContent();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [phoneCopied, setPhoneCopied] = useState(false);
+
+  const copyPhoneToClipboard = async () => {
+    const text = c.contact.phone.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      setPhoneCopied(true);
+      window.setTimeout(() => setPhoneCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers / denied permission
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        setPhoneCopied(true);
+        window.setTimeout(() => setPhoneCopied(false), 2000);
+      } catch {
+        /* ignore */
+      }
+    }
+  };
 
   const contactSchema = useMemo(
     () =>
       z.object({
         name: z.string().min(2, c.contact.nameError),
         email: z.string().email(c.contact.emailError),
+        phone: z
+          .string()
+          .trim()
+          .refine((v) => {
+            const d = phoneDigits(v);
+            return d.length >= 8 && d.length <= 15;
+          }, c.contact.phoneError),
         message: z.string().min(10, c.contact.messageError),
       }),
-    [c.contact.nameError, c.contact.emailError, c.contact.messageError]
+    [c.contact.nameError, c.contact.emailError, c.contact.phoneError, c.contact.messageError]
   );
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
+    defaultValues: { name: "", email: "", phone: "", message: "" },
   });
 
   const onSubmit = async (data: ContactFormValues) => {
@@ -36,7 +74,7 @@ export function Contact() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: data.name, email: data.email, message: data.message }),
+        body: JSON.stringify({ name: data.name, email: data.email, phone: data.phone.trim(), message: data.message }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -71,9 +109,29 @@ export function Contact() {
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                       <Phone className="w-5 h-5 text-accent" />
                     </div>
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm text-primary-foreground/60 mb-1">{c.contact.phoneLabel}</p>
-                      <p className="font-medium text-white">{c.contact.phone}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium text-white">{c.contact.phone}</p>
+                        <button
+                          type="button"
+                          onClick={copyPhoneToClipboard}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-white/25 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          aria-label={c.contact.copyPhone}
+                        >
+                          {phoneCopied ? (
+                            <>
+                              <Check className="h-3.5 w-3.5 text-accent" aria-hidden />
+                              {c.contact.phoneCopied}
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3.5 w-3.5" aria-hidden />
+                              {c.contact.copyPhone}
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -124,6 +182,11 @@ export function Contact() {
                     <label className="text-sm font-semibold text-foreground">{c.contact.emailInputLabel}</label>
                     <input {...register("email")} type="email" className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder={c.contact.emailPlaceholder} />
                     {errors.email && <p className="text-sm text-destructive mt-1">{errors.email.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-foreground">{c.contact.phoneInputLabel}</label>
+                    <input {...register("phone")} type="tel" autoComplete="tel" className="w-full px-4 py-3 rounded-xl bg-background border-2 border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder={c.contact.phonePlaceholder} />
+                    {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-foreground">{c.contact.messageLabel}</label>
